@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
-
+from hasher import Hasher
 
 class App:
     
@@ -9,7 +9,7 @@ class App:
     label = None
     frame = None
     create_hash_button = None
-    view_hash_button = None
+    save_hash_button = None
     hash_type = None
     hash_header = None
     hash_frame = None
@@ -17,6 +17,12 @@ class App:
     browse_frame = None
     browse_button = None
     browse_textbox = None
+    result_frame = None,
+    copy_button = None,
+    result_label = None,
+    result_textbox = None
+    
+    hash_code = None
     
     hash_types = ('sha1','sha224','sha256','sha384','sha512'
                  ,'sha3_224','sha3_256','sha3_384','sha3_512',
@@ -30,10 +36,10 @@ class App:
        
         App.button_frame = Frame(App.root)
         App.create_hash_button = Button(App.button_frame,text='Create Hash',width=25,command=App.__create_hash)
-        App.view_hash_button = Button(App.button_frame,text='View Hash',width=25,command=App.__view_hash)
+        App.save_hash_button = Button(App.button_frame,text='Save Hash',width=25,command=App.__save_hash)
         App.create_hash_button.pack(side=LEFT,padx=5)
        
-        App.view_hash_button.pack(side=LEFT,padx=5)
+        App.save_hash_button.pack(side=LEFT,padx=5)
         App.button_frame.pack(side=BOTTOM,pady=20)
         
         App.hash_frame = Frame(App.root)
@@ -45,12 +51,22 @@ class App:
         App.hash_type.state(['readonly'])
         
         App.browse_frame = Frame(App.root)
-        App.browse_textbox = Entry(App.browse_frame,width=60,)
+        App.browse_textbox = Entry(App.browse_frame,width=60)
         App.browse_textbox.config(state='readonly')
         App.browse_textbox.pack(side=LEFT)
         App.browse_button = Button(App.browse_frame, text='Browse...',width=10,command=App.__browse)
         App.browse_button.pack(side=RIGHT)
-        App.browse_frame.pack(side=LEFT,pady=20,padx=10)
+        App.browse_frame.pack(anchor='w',pady=0,padx=10)
+        
+        App.result_frame = Frame(App.root)
+        App.result_label = Label(App.result_frame,text="Hash Result -")
+        App.result_textbox = Entry(App.result_frame,width=45)
+        App.copy_button = Button(App.result_frame, text="Copy Hash",width=10,command=App.__copy_hash)
+        App.copy_button.pack(side=RIGHT)
+        App.result_textbox.config(state="readonly")
+        App.result_label.pack(side=LEFT,pady=10,padx=10)
+        App.result_textbox.pack(side=LEFT)
+        App.result_frame.pack(anchor='w')
         
         App.hash_header.pack(side=LEFT)
         App.hash_type.pack(side=LEFT)     
@@ -73,10 +89,20 @@ class App:
         
     @staticmethod
     def __create_hash():
-        pass
+        App.hash_code = Hasher.create_Hash(App.hash_type.get(), App.browse_textbox.get())
+        App.result_textbox.config(state='normal')
+        App.result_textbox.delete(0,END)
+        App.result_textbox.insert(0,App.hash_code)
+        App.result_textbox.config(state='readonly')
         
     @staticmethod
-    def __view_hash():
+    def __save_hash():
+        Hasher.save_file(App.hash_type.get(),App.browse_textbox.get(),App.hash_code)
+    
+    @staticmethod
+    def __copy_hash():
+        App.root.clipboard_clear()
+        App.root.clipboard_append(App.result_textbox.get())
         pass
     
     @staticmethod
