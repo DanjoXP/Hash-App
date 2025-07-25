@@ -89,7 +89,7 @@ class App:
         
     @staticmethod
     def __create_hash():
-        App.hash_code = Hasher.create_Hash(App.hash_type.get(), App.browse_textbox.get())
+        App.hash_code = Hasher.create_hash(App.hash_type.get(), App.browse_textbox.get())
         App.result_textbox.config(state='normal')
         App.result_textbox.delete(0,END)
         App.result_textbox.insert(0,App.hash_code)
@@ -97,6 +97,11 @@ class App:
         
     @staticmethod
     def __save_hash():
+        
+        if App.hash_code is None:
+            print("No Hash Generated To Save")
+            return
+        
         Hasher.save_file(App.hash_type.get(),App.browse_textbox.get(),App.hash_code)
     
     @staticmethod
@@ -110,6 +115,10 @@ class App:
         file_selected = filedialog.askopenfilename()
         
         if file_selected:
+            App.hash_code = None
+            App.result_textbox.config(state='normal')
+            App.result_textbox.delete(0,END)
+            App.result_textbox.config(state='readonly')
             App.browse_textbox.config(state='normal')
             App.browse_textbox.delete(0,END)
             App.browse_textbox.insert(0,file_selected)
