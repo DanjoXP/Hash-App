@@ -1,10 +1,9 @@
 from tkinter import *
-from tkinter import ttk
-from tkinter import filedialog
+from tkinter import ttk, filedialog, messagebox
 from hasher import Hasher
 
 class App:
-    
+    # GUI components
     root = None
     label = None
     frame = None
@@ -17,16 +16,18 @@ class App:
     browse_frame = None
     browse_button = None
     browse_textbox = None
-    result_frame = None,
-    copy_button = None,
-    result_label = None,
+    result_frame = None
+    copy_button = None
+    result_label = None
     result_textbox = None
-    
+
+
     hash_code = None
-    
-    hash_types = ('sha1','sha224','sha256','sha384','sha512'
-                 ,'sha3_224','sha3_256','sha3_384','sha3_512',
-                 'shake_128','shake_256','blake2b','blake2s','md5')
+    hash_types = (
+        'sha1','sha224','sha256','sha384','sha512',
+        'sha3_224','sha3_256','sha3_384','sha3_512',
+        'shake_128','shake_256','blake2b','blake2s','md5'
+    )
     
     # populate window intentionally mangled to make it private and to discourage calls from outside of class.
     @staticmethod
@@ -97,12 +98,15 @@ class App:
         
     @staticmethod
     def __save_hash():
-        
         if App.hash_code is None:
+            messagebox.showwarning("Warning", "No Hash Generated To Save")
             print("No Hash Generated To Save")
             return
-        
-        Hasher.save_file(App.hash_type.get(),App.browse_textbox.get(),App.hash_code)
+        try:
+            Hasher.save_file(App.hash_type.get(),App.browse_textbox.get(),App.hash_code)
+            messagebox.showinfo("Success", "Hash saved successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save hash:\n{e}")
     
     @staticmethod
     def __copy_hash():
