@@ -7,7 +7,6 @@ class App:
     root = None
     label = None
     frame = None
-    create_hash_button = None
     save_hash_button = None
     hash_type = None
     hash_header = None
@@ -117,9 +116,14 @@ class App:
     
     @staticmethod
     def __copy_hash():
+        
+        if App.result_textbox.get() is None or App.result_textbox.get().strip() == "":
+            messagebox.showwarning("Warning","There Is Nothing To Copy To Clipboard!")
+            return
+        
         App.root.clipboard_clear()
         App.root.clipboard_append(App.result_textbox.get())
-        pass
+        messagebox.showinfo("Clipboard","Hash Copied To Clipboard!")
     
     @staticmethod
     def __browse():
