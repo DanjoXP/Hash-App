@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk, filedialog, messagebox,simpledialog
 from hasher import Hasher
+import os
 
 class App:
     # GUI components
@@ -20,8 +21,8 @@ class App:
     result_label = None
     result_textbox = None
     compare_hash_button = None
-
-
+    file_name = None
+    
     hash_code = None
     hash_types = (
         'sha1','sha224','sha256','sha384','sha512',
@@ -29,7 +30,7 @@ class App:
         'shake_128','shake_256','blake2b','blake2s','md5'
     )
     
-    # populate window intentionally mangled to make it private and to discourage calls from outside of class.
+    # Populates window with UI elements
     @staticmethod
     def __populate_window():
         App.label = Label(App.root, text='Hash Application v1')
@@ -73,7 +74,8 @@ class App:
         
         App.hash_header.pack(side=LEFT)
         App.hash_type.pack(side=LEFT)     
-        
+    
+    # Creates Window with dimensions and title   
     @staticmethod
     def create_window(X,Y,TITLE):
        if App.root is None:
@@ -84,8 +86,9 @@ class App:
            App.root.maxsize(X*2,Y*2)
            App.__populate_window()
        else:
-           print('App Already Created!')
+           messagebox.showerror("Error", "App Already Created")
     
+    # Displays window / starts main loop   
     @staticmethod 
     def open_window():
         App.root.mainloop()
@@ -102,18 +105,30 @@ class App:
         App.result_textbox.delete(0,END)
         App.result_textbox.insert(0,App.hash_code)
         App.result_textbox.config(state='readonly')
-        
+    
+    # Opens save dialog, and displays outcome of save
     @staticmethod
     def __save_hash():
         if App.hash_code is None:
             messagebox.showwarning("Warning", "No Hash Generated To Save")
             return
         try:
-            Hasher.save_file(App.hash_type.get(),App.browse_textbox.get(),App.hash_code)
+            file_path = filedialog.asksaveasfilename(
+                title="Save Hash Code",
+                initialfile=f"{os.path.basename(App.browse_textbox.get())}.{App.hash_type.get()}",
+                defaultextension= f".{App.hash_type.get()}",
+                filetypes=[("All Files","*.*")]
+                )
+            
+            if not file_path:
+                return
+            
+            Hasher.save_file(App.hash_type.get(),file_path,App.hash_code)
             messagebox.showinfo("Success", "Hash saved successfully.")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save hash:\n{e}")
-    
+     
+    # Copies hash to clipboard, warns if no hash generated.
     @staticmethod
     def __copy_hash():
         
@@ -125,11 +140,13 @@ class App:
         App.root.clipboard_append(App.result_textbox.get())
         messagebox.showinfo("Clipboard","Hash Copied To Clipboard!")
     
+    # Opens file dialog, updates textbox to full path, resets related variables
     @staticmethod
     def __browse():
         file_selected = filedialog.askopenfilename()
         
         if file_selected:
+            App.file_name = None
             App.hash_code = None
             App.result_textbox.config(state='normal')
             App.result_textbox.delete(0,END)
@@ -138,7 +155,9 @@ class App:
             App.browse_textbox.delete(0,END)
             App.browse_textbox.insert(0,file_selected)
             App.browse_textbox.config(state='readonly')
-            
+            App.file_name = os.path.basename(file_selected)
+    
+    # Compares user entered hash with generated hash, displays result.       
     @staticmethod
     def __compare_hash():
         if App.hash_code is None:

@@ -20,6 +20,7 @@ class Hasher:
         'md5' : hashlib.md5
     }
 
+    # Generates hash of a file using selected algorithm and returns the result
     @staticmethod
     def get_hash(hash_alg,file_path):
         hash = Hasher.hashes[hash_alg]()
@@ -33,11 +34,10 @@ class Hasher:
 
         return hash.hexdigest()
     
+    # Saves hash to selected filepath
     @staticmethod
     def save_file(hash_alg,file_path,hash):
-        new_file_path = f"{file_path}.{hash_alg}"
-        
-        with open(new_file_path,"w") as file:
-            print(hash)
+        with open(file_path,"w") as file:
             file.write(hash)
+            
             
