@@ -21,7 +21,7 @@ class Hasher:
     }
 
     @staticmethod
-    def create_hash(hash_alg,file_path):
+    def get_hash(hash_alg,file_path):
         hash = Hasher.hashes[hash_alg]()
         
         with open(file_path, 'rb') as file:
