@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox,simpledialog
 from hasher import Hasher
 
 class App:
@@ -20,6 +20,7 @@ class App:
     copy_button = None
     result_label = None
     result_textbox = None
+    compare_hash_button = None
 
 
     hash_code = None
@@ -36,10 +37,12 @@ class App:
         App.label.pack() 
        
         App.button_frame = Frame(App.root)
-        App.create_hash_button = Button(App.button_frame,text='Create Hash',width=25,command=App.__create_hash)
-        App.save_hash_button = Button(App.button_frame,text='Save Hash',width=25,command=App.__save_hash)
-        App.create_hash_button.pack(side=LEFT,padx=5)
-       
+        App.get_hash_button = Button(App.button_frame,text='Get Hash',width=15,command=App.__get_hash)
+        App.save_hash_button = Button(App.button_frame,text='Save Hash',width=15,command=App.__save_hash)
+        App.compare_hash_button = Button(App.button_frame,text='Compare Hash',width=15,command=App.__compare_hash)
+        
+        App.get_hash_button.pack(side=LEFT,padx=5)
+        App.compare_hash_button.pack(side=LEFT, padx=5)
         App.save_hash_button.pack(side=LEFT,padx=5)
         App.button_frame.pack(side=BOTTOM,pady=20)
         
@@ -89,8 +92,13 @@ class App:
         App.root.mainloop()
         
     @staticmethod
-    def __create_hash():
-        App.hash_code = Hasher.create_hash(App.hash_type.get(), App.browse_textbox.get())
+    def __get_hash():
+        
+        if App.browse_textbox.get() is None or App.browse_textbox.get().strip() == "":
+            messagebox.showwarning("Warning", "Please Select A File To Hash")
+            return
+        
+        App.hash_code = Hasher.get_hash(App.hash_type.get(), App.browse_textbox.get())
         App.result_textbox.config(state='normal')
         App.result_textbox.delete(0,END)
         App.result_textbox.insert(0,App.hash_code)
@@ -100,7 +108,6 @@ class App:
     def __save_hash():
         if App.hash_code is None:
             messagebox.showwarning("Warning", "No Hash Generated To Save")
-            print("No Hash Generated To Save")
             return
         try:
             Hasher.save_file(App.hash_type.get(),App.browse_textbox.get(),App.hash_code)
@@ -127,3 +134,20 @@ class App:
             App.browse_textbox.delete(0,END)
             App.browse_textbox.insert(0,file_selected)
             App.browse_textbox.config(state='readonly')
+            
+    @staticmethod
+    def __compare_hash():
+        if App.hash_code is None:
+            messagebox.showwarning("Warning","No Hash Generated To Compare")
+            return 
+        
+        code = simpledialog.askstring("Input","Enter Hash To Compare")
+        
+        if code is None or code.strip() == "":
+            return
+        
+        if code.strip() == App.hash_code.strip():
+            messagebox.showinfo("Result","The Hashes Match")
+        else:
+            messagebox.showinfo("Result","The Hashes Are Different")
+        
